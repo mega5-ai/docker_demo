@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Image Classification</title>
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+margin-top:60px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+cursor:pointer;
+}
+
+#preview{
+margin-top:20px;
+max-width:300px;
+}
+
+#result{
+margin-top:20px;
+font-size:20px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Upload Image for Prediction</h1>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<br><br>
+
+<button onclick="uploadImage()">Predict</button>
+
+<br>
+
+<img id="preview"/>
+
+<div id="result"></div>
+
+<script>
+
+const imageInput = document.getElementById("imageInput")
+const preview = document.getElementById("preview")
+
+imageInput.addEventListener("change", function(){
+const file = this.files[0]
+preview.src = URL.createObjectURL(file)
+})
+
+async function uploadImage(){
+
+const file = imageInput.files[0]
+
+if(!file){
+alert("Please upload image")
+return
+}
+
+const formData = new FormData()
+formData.append("file", file)
+
+document.getElementById("result").innerHTML="Predicting..."
+
+try{
+
+const response = await fetch("/predict_image",{
+method:"POST",
+body:formData
+})
+
+const data = await response.json()
+
+document.getElementById("result").innerHTML=
+"Prediction: "+data.prediction+
+"<br>Confidence: "+(data.confidence*100).toFixed(2)+"%"
+
+}
+catch(error){
+
+document.getElementById("result").innerHTML="Error connecting API"
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
